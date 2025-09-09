@@ -1,0 +1,3 @@
+git fetch upstream
+git rebase upstream/main    # or: git merge upstream/main
+git push --force-with-lease origin main   # only if rebased
