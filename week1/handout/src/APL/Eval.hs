@@ -26,7 +26,26 @@ envLookup :: VName -> Env -> Maybe Val
 
 envLookup v_name env = lookup v_name env
 
+evalIntBinOp' :: (Integer -> Integer -> Integer) -> Env -> Exp -> Exp -> Either Error Val
+evalIntBinOp' f = evalIntBinOp f'
+  where
+    f' x y = Right $ f x y
+
 eval :: Env -> Exp -> Either Error Val
+
+eval env (Add e1 e2) = evalIntBinOp' (+) env e1 e2
+eval env (Sub e1 e2) = evalIntBinOp' (-) env e1 e2
+eval env (Mul e1 e2) = evalIntBinOp' (*) env e1 e2
+eval env (Div e1 e2) = evalIntBinOp checkedDiv env e1 e2
+  where
+    checkedDiv _ 0 = Left "Division by zero"
+    checkedDiv x y = Right $ x `div` y
+eval env (Pow e1 e2) = evalIntBinOp checkedPow env e1 e2
+  where
+    checkedPow x y =
+      if y < 0
+        then Left "Negative exponent"
+        else Right $ x ^ y
 
 eval env (Var v) =
   case envLookup v env of
@@ -40,37 +59,37 @@ eval env (Let var e1 e2) =
 
 eval env (CstInt x) = Right(ValInt x)
 
-eval env (Add e1 e2) =
-  case (eval env e1, eval env e2) of
-    (Left err, _) -> Left err
-    (_, Left err) -> Left err
-    (Right (ValInt x), Right (ValInt y)) -> Right(ValInt (x + y))
+-- eval env (Add e1 e2) =
+--   case (eval env e1, eval env e2) of
+--     (Left err, _) -> Left err
+--     (_, Left err) -> Left err
+--     (Right (ValInt x), Right (ValInt y)) -> Right(ValInt (x + y))
 
-eval env (Sub e1 e2) =
-  case (eval env e1, eval env e2) of
-    (Left err, _) -> Left err
-    (_, Left err) -> Left err
-    (Right (ValInt x), Right (ValInt y)) -> Right(ValInt (x - y))
+-- eval env (Sub e1 e2) =
+--   case (eval env e1, eval env e2) of
+--     (Left err, _) -> Left err
+--     (_, Left err) -> Left err
+--     (Right (ValInt x), Right (ValInt y)) -> Right(ValInt (x - y))
 
-eval env (Mul e1 e2) =
-  case (eval env e1, eval env e2) of
-    (Left err, _) -> Left err
-    (_, Left err) -> Left err
-    (Right (ValInt x), Right (ValInt y)) -> Right(ValInt (x * y))
+-- eval env (Mul e1 e2) =
+--   case (eval env e1, eval env e2) of
+--     (Left err, _) -> Left err
+--     (_, Left err) -> Left err
+--     (Right (ValInt x), Right (ValInt y)) -> Right(ValInt (x * y))
 
-eval env (Div e1 e2) =
-  case (eval env e1, eval env e2) of
-    (Left err, _) -> Left err
-    (_, Left err) -> Left err
-    (Right (ValInt _), Right (ValInt 0)) -> Left "division by zero"
-    (Right (ValInt x), Right (ValInt y)) -> Right (ValInt (x `div` y))
+-- eval env (Div e1 e2) =
+--   case (eval env e1, eval env e2) of
+--     (Left err, _) -> Left err
+--     (_, Left err) -> Left err
+--     (Right (ValInt _), Right (ValInt 0)) -> Left "division by zero"
+--     (Right (ValInt x), Right (ValInt y)) -> Right (ValInt (x `div` y))
 
-eval env (Pow e1 e2) =
-  case (eval env e1, eval env e2) of
-    (Left err, _) -> Left err
-    (_, Left err) -> Left err
-    (Right (ValInt _), Right (ValInt y))|y < 0 -> Left "negative exponent"
-    (Right (ValInt x), Right (ValInt y)) -> Right (ValInt (x ^ y))
+-- eval env (Pow e1 e2) =
+--   case (eval env e1, eval env e2) of
+--     (Left err, _) -> Left err
+--     (_, Left err) -> Left err
+--     (Right (ValInt _), Right (ValInt y))|y < 0 -> Left "negative exponent"
+--     (Right (ValInt x), Right (ValInt y)) -> Right (ValInt (x ^ y))
 
 eval env (CstBool x) = Right (ValBool x)
 
