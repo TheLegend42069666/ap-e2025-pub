@@ -1,7 +1,7 @@
 module APL.Parser_Tests (tests) where
 
 import APL.AST (Exp (..))
-import APL.Parser (parseAPL)
+import APL.Parser (parseAPL, lInteger, pExp)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertFailure, testCase, (@?=))
 
@@ -31,4 +31,6 @@ tests :: TestTree
 tests =
   testGroup
     "Parsing"
-    []
+    [parserTest "123" (CstInt 123),
+     parserTestFail "123abc",
+     parserTest "ayo  " (Var "ayo")]

@@ -22,3 +22,20 @@ data Exp
   | Apply Exp Exp
   | TryCatch Exp Exp
   deriving (Eq, Show)
+
+-- Atom ::= var
+--        | int
+--        | bool
+--        | "(" Exp ")"
+
+-- Exp ::= Atom
+--       | Exp "+" Exp
+--       | Exp "-" Exp
+--       | Exp "*" Exp
+--       | Exp "/" Exp
+
+-- Exp0' ::=            (* empty *)
+--         | "+" Atom Exp0'
+--         | "-" Atom Exp0'
+--         | "*" Atom Exp0'
+--         | "/" Atom Exp0'
